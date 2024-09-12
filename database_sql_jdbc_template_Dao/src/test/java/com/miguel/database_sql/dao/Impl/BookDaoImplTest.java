@@ -46,4 +46,33 @@ public class BookDaoImplTest {
                 eq("12d2131d"));
     }
 
+    @Test
+    public void testThatFindManyBooksGenerateCorrectSQL() {
+        underTest.findAll();
+
+        verify(jdbcTemplate).query(eq("SELECT isbn, title, author_id FROM books"),
+                ArgumentMatchers.<BookDaoImpl.BookRowWrapper>any());
+    }
+
+    @Test
+    public void testThatUpdateBooksGenerateCorrectSQL() {
+        Book book = TestDataUtil.createTestBook();
+        underTest.update("Testing_isbn", book);
+
+        verify(jdbcTemplate).update(
+                eq("UPDATE books SET isbn = ?, title = ?, author_id = ? WHERE isbn = ?"),
+                eq("12d2131d"),
+                eq("Book Title"),
+                eq(1L),
+                eq("Testing_isbn"));
+    }
+
+    @Test
+    public void testThatDeleteBooksGenerateCorrectSQL() {
+        underTest.delete("12d2131d");
+
+        verify(jdbcTemplate).update(
+                eq("DELETE FROM books WHERE isbn = ?"), eq("12d2131d"));
+    }
+
 }
