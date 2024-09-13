@@ -1,4 +1,4 @@
-package com.miguel.database_sql.domain;
+package com.miguel.database_sql.domain.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,10 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Author {
-
+public class AuthorDto {
     private Long id;
     private String name;
     private Integer age;
-
 }
