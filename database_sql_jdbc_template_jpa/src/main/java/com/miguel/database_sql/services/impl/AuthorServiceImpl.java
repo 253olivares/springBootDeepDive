@@ -1,5 +1,8 @@
 package com.miguel.database_sql.services.impl;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.stereotype.Service;
 
 import com.miguel.database_sql.domain.entities.AuthorEntity;
@@ -16,7 +19,22 @@ public class AuthorServiceImpl implements AuthorService {
     }
 
     @Override
-    public AuthorEntity createAuthor(AuthorEntity author) {
+    public AuthorEntity saveAuthor(AuthorEntity author) {
         return authorRepository.save(author);
+    }
+
+    @Override
+    public List<AuthorEntity> findAll() {
+        return (List<AuthorEntity>) authorRepository.findAll();
+    }
+
+    @Override
+    public Optional<AuthorEntity> findOne(Long id) {
+        return authorRepository.findById(id);
+    }
+
+    @Override
+    public boolean isExists(Long id) {
+        return authorRepository.existsById(id);
     }
 }
