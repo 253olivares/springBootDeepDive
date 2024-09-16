@@ -201,4 +201,91 @@ public class AuthorControllerIntegrationTests {
 
         }
 
+        @Test
+        public void testThatPatchAuthorReturnsHttpStatusOk() throws Exception {
+                AuthorEntity testAuthor = TestDataUtil.createTestAuthor();
+                AuthorEntity savedAuthor = authorService.saveAuthor(testAuthor);
+
+                AuthorEntity testAuthorUpdate = AuthorEntity.builder()
+                                .id(null)
+                                .name("Crancky")
+                                .age(null)
+                                .build();
+
+                String testAuthorUpdateJson = objectMapper.writeValueAsString(testAuthorUpdate);
+
+                mockMvc.perform(
+                                MockMvcRequestBuilders.patch("/api/authors/" + savedAuthor.getId())
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(testAuthorUpdateJson))
+                                .andExpect(
+                                                MockMvcResultMatchers.status().isOk());
+
+        }
+
+        @Test
+        public void testThatPatchAuthorReturnsHttpStatusNotFound() throws Exception {
+                AuthorEntity testAuthorUpdate = AuthorEntity.builder()
+                                .id(null)
+                                .name("Crancky")
+                                .age(null)
+                                .build();
+                String testAuthorUpdateJson = objectMapper.writeValueAsString(testAuthorUpdate);
+
+                mockMvc.perform(
+                                MockMvcRequestBuilders.patch("/api/authors/" + 53)
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(testAuthorUpdateJson))
+                                .andExpect(
+                                                MockMvcResultMatchers.status().isNotFound());
+
+        }
+
+        @Test
+        public void testThatPatchAuthorChangesValues() throws Exception {
+                AuthorEntity authorEntity = TestDataUtil.createTestAuthor();
+                AuthorEntity savedAuthor = authorService.saveAuthor(authorEntity);
+
+                AuthorEntity authorEntityUpdate = AuthorEntity.builder()
+                                .id(null)
+                                .name("Update")
+                                .age(null)
+                                .build();
+
+                String testAuthorUpdateJson = objectMapper.writeValueAsString(authorEntityUpdate);
+
+                mockMvc.perform(
+                                MockMvcRequestBuilders.patch("/api/authors/" + savedAuthor.getId())
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content(testAuthorUpdateJson))
+                                .andExpect(
+                                                MockMvcResultMatchers.jsonPath("$.id").value(authorEntity.getId()))
+                                .andExpect(
+                                                MockMvcResultMatchers.jsonPath("$.name").value("Update"))
+                                .andExpect(
+                                                MockMvcResultMatchers.jsonPath("$.age").value(authorEntity.getAge()));
+        }
+
+        @Test
+        public void testThatDeleteAuthorReturnsHttpNoContent() throws Exception {
+
+                AuthorEntity authorEntity = TestDataUtil.createTestAuthor();
+                AuthorEntity savedAuthor = authorService.saveAuthor(authorEntity);
+
+                mockMvc.perform(
+                                MockMvcRequestBuilders.delete("/api/authors/" + savedAuthor.getId())
+                                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(
+                                                MockMvcResultMatchers.status().isNoContent());
+        }
+
+        @Test
+        public void testThatDeleteAuthorReturnsHttpNotFound() throws Exception {
+
+                mockMvc.perform(
+                                MockMvcRequestBuilders.delete("/api/authors/" + 50)
+                                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(
+                                                MockMvcResultMatchers.status().isNotFound());
+        }
 }

@@ -17,7 +17,9 @@ import com.miguel.database_sql.domain.entities.BookEntity;
 import com.miguel.database_sql.mappers.Mapper;
 import com.miguel.database_sql.services.BookService;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 
 @RestController
 @RequestMapping("/api/books")
@@ -68,4 +70,27 @@ public class BookController {
         }
     }
 
+    @PatchMapping("/{isbn}")
+    public ResponseEntity<BookDto> patchBookUpdate(
+            @PathVariable("isbn") String isbn, @RequestBody BookDto bookDto) {
+        if (!bookService.isExists(isbn)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        BookEntity bookEntity = bookMapper.mapFrom(bookDto);
+
+        BookEntity updatedBook = bookService.partialUpdateBook(isbn, bookEntity);
+
+        return new ResponseEntity<>(bookMapper.mapTo(updatedBook), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{isbn}")
+    public ResponseEntity deleteBook(@PathVariable("isbn") String isbn) {
+        if (!bookService.isExists(isbn)) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        } else {
+            bookService.delete(isbn);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }
+    }
 }
