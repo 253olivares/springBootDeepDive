@@ -7,15 +7,18 @@ import org.springframework.stereotype.Service;
 
 import com.miguel.database_sql.domain.entities.AuthorEntity;
 import com.miguel.database_sql.repositories.AuthorRepository;
+import com.miguel.database_sql.repositories.BookRepository;
 import com.miguel.database_sql.services.AuthorService;
 
 @Service
 public class AuthorServiceImpl implements AuthorService {
 
     private AuthorRepository authorRepository;
+    private BookRepository bookRepository;
 
-    public AuthorServiceImpl(AuthorRepository authorRepository) {
+    public AuthorServiceImpl(AuthorRepository authorRepository, BookRepository bookRepository) {
         this.authorRepository = authorRepository;
+        this.bookRepository = bookRepository;
     }
 
     @Override
@@ -51,6 +54,7 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public void delete(Long id) {
+        bookRepository.deleteBooksFromAuthorDelete(id);
         authorRepository.deleteById(id);
     }
 }

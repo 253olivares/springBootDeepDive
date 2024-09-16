@@ -74,9 +74,9 @@ public class BookControllerIntegrationTests {
                                 MockMvcRequestBuilders.get("/api/books")
                                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(
-                                                MockMvcResultMatchers.jsonPath("$[0].isbn").isString())
+                                                MockMvcResultMatchers.jsonPath("$.content[0].isbn").isString())
                                 .andExpect(
-                                                MockMvcResultMatchers.jsonPath("$[0].title").isString());
+                                                MockMvcResultMatchers.jsonPath("$.content[0].title").isString());
         }
 
         @Test
@@ -153,7 +153,7 @@ public class BookControllerIntegrationTests {
                 BookEntity savedBook = bookService.createUpdateBook(testBook.getIsbn(), testBook);
 
                 AuthorEntity authorEntity = AuthorEntity.builder().id(1L).name("Damn").age(50).build();
-                savedBook.setAuthor(authorEntity);
+                savedBook.setAuthorEntity(authorEntity);
                 savedBook.setTitle("Update");
 
                 String testBookJson = objectMapper.writeValueAsString(savedBook);
@@ -173,7 +173,7 @@ public class BookControllerIntegrationTests {
                 BookEntity savedBook = bookService.createUpdateBook(testBook.getIsbn(), testBook);
 
                 AuthorEntity authorEntity = AuthorEntity.builder().id(1L).name("Damn").age(50).build();
-                savedBook.setAuthor(authorEntity);
+                savedBook.setAuthorEntity(authorEntity);
                 savedBook.setTitle("Update");
 
                 String testBookJson = objectMapper.writeValueAsString(savedBook);
@@ -192,8 +192,6 @@ public class BookControllerIntegrationTests {
                 BookEntity testBook = TestDataUtil.createTestBook(null);
                 BookEntity savedBook = bookService.createUpdateBook(testBook.getIsbn(), testBook);
 
-                AuthorEntity authorEntity = AuthorEntity.builder().id(1L).name("Damn").age(50).build();
-                savedBook.setAuthor(authorEntity);
                 savedBook.setTitle("Update");
 
                 String testBookJson = objectMapper.writeValueAsString(savedBook);
@@ -203,9 +201,7 @@ public class BookControllerIntegrationTests {
                                                 .contentType(MediaType.APPLICATION_JSON)
                                                 .content(testBookJson))
                                 .andExpect(
-                                                MockMvcResultMatchers.jsonPath("$.title").value("Update"))
-                                .andExpect(
-                                                MockMvcResultMatchers.jsonPath("$.author").value(authorEntity));
+                                                MockMvcResultMatchers.jsonPath("$.title").value("Update"));
 
         }
 

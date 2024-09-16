@@ -1,9 +1,9 @@
 package com.miguel.database_sql.controllers;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -34,10 +34,9 @@ public class BookController {
     }
 
     @GetMapping
-    public ResponseEntity<List<BookDto>> getAllbooks() {
-        List<BookEntity> lists = bookService.getBooks();
-        List<BookDto> results = lists.stream().map(bookMapper::mapTo).collect(Collectors.toList());
-        return new ResponseEntity<>(results, HttpStatus.OK);
+    public ResponseEntity<Page<BookDto>> getAllbooks(Pageable pageable) {
+        Page<BookEntity> lists = bookService.findAll(pageable);
+        return new ResponseEntity<>(lists.map(bookMapper::mapTo), HttpStatus.OK);
     }
 
     @GetMapping("/{isbn}")
@@ -84,7 +83,7 @@ public class BookController {
         return new ResponseEntity<>(bookMapper.mapTo(updatedBook), HttpStatus.OK);
     }
 
-    @DeleteMapping("/{isbn}")
+    @DeleteMapping(path = "/{isbn}")
     public ResponseEntity deleteBook(@PathVariable("isbn") String isbn) {
         if (!bookService.isExists(isbn)) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
