@@ -9,7 +9,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.miguel.database_sql.domain.dto.BookDto;
 import com.miguel.database_sql.domain.entities.BookEntity;
+import com.miguel.database_sql.mappers.Mapper;
 import com.miguel.database_sql.repositories.BookRepository;
 import com.miguel.database_sql.services.BookService;
 
@@ -17,32 +19,37 @@ import com.miguel.database_sql.services.BookService;
 public class BookServiceImpl implements BookService {
 
     private BookRepository bookRepository;
+    private Mapper<BookEntity, BookDto> bookMapper;
 
-    public BookServiceImpl(BookRepository bookRepository) {
+    public BookServiceImpl(BookRepository bookRepository, Mapper<BookEntity, BookDto> bookMapper) {
         this.bookRepository = bookRepository;
+        this.bookMapper = bookMapper;
     }
 
     @Override
-    public BookEntity createUpdateBook(String isbn, BookEntity book) {
+    public BookDto createUpdateBook(String isbn, BookDto book) {
 
-        book.setIsbn(isbn);
-
-        return bookRepository.save(book);
+        BookEntity bookEntity = bookMapper.mapFrom(book);
+        bookEntity.setIsbn(isbn);
+        BookEntity results = bookRepository.save(bookEntity);
+        return bookMapper.mapTo(results);
     }
 
     @Override
-    public List<BookEntity> findAll() {
-        return StreamSupport.stream(bookRepository.findAll().spliterator(), false).collect(Collectors.toList());
+    public List<BookDto> findAll() {
+        List<BookEntity> list = StreamSupport.stream(bookRepository.findAll().spliterator(), false)
+                .collect(Collectors.toList());
+        return list.stream().map(bookMapper::mapTo).collect(Collectors.toList());
     }
 
     @Override
-    public Page<BookEntity> findAll(Pageable pageable) {
-        return bookRepository.findAll(pageable);
+    public Page<BookDto> findAll(Pageable pageable) {
+        return bookRepository.findAll(pageable).map(bookMapper::mapTo);
     }
 
     @Override
-    public Optional<BookEntity> findOne(String isbn) {
-        return bookRepository.findById(isbn);
+    public Optional<BookDto> findOne(String isbn) {
+        return bookRepository.findById(isbn).map(bookMapper::mapTo);
     }
 
     @Override
@@ -51,14 +58,15 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public BookEntity partialUpdateBook(String isbn, BookEntity bookEntity) {
+    public BookDto partialUpdateBook(String isbn, BookDto bookDto) {
 
-        bookEntity.setIsbn(isbn);
-
+        bookDto.setIsbn(isbn);
+        BookEntity bookEntity = bookMapper.mapFrom(bookDto);
         BookEntity bookFound = bookRepository.findById(isbn).get();
         Optional.ofNullable(bookEntity.getTitle()).ifPresent(bookFound::setTitle);
         Optional.ofNullable(bookEntity.getAuthorEntity()).ifPresent(bookFound::setAuthorEntity);
-        return bookRepository.save(bookFound);
+
+        return bookMapper.mapTo(bookRepository.save(bookFound));
     }
 
     @Override

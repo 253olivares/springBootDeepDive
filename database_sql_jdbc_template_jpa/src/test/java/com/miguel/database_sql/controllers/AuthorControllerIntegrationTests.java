@@ -14,7 +14,9 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.miguel.database_sql.TestDataUtil;
+import com.miguel.database_sql.domain.dto.AuthorDto;
 import com.miguel.database_sql.domain.entities.AuthorEntity;
+import com.miguel.database_sql.mappers.Mapper;
 import com.miguel.database_sql.services.AuthorService;
 
 @SpringBootTest
@@ -29,12 +31,15 @@ public class AuthorControllerIntegrationTests {
 
         private ObjectMapper objectMapper;
 
+        private Mapper<AuthorEntity, AuthorDto> authorMapper;
+
         @Autowired
         public AuthorControllerIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper,
-                        AuthorService authorService) {
+                        AuthorService authorService, Mapper<AuthorEntity, AuthorDto> authorMapper) {
                 this.mockMvc = mockMvc;
                 this.objectMapper = objectMapper;
                 this.authorService = authorService;
+                this.authorMapper = authorMapper;
         }
 
         @Test
@@ -81,7 +86,7 @@ public class AuthorControllerIntegrationTests {
         public void testThatListAuthorReturnsListOfAuthors() throws Exception {
 
                 AuthorEntity testAuthorEntity = TestDataUtil.createTestAuthor();
-                authorService.saveAuthor(testAuthorEntity);
+                authorService.saveAuthor(authorMapper.mapTo(testAuthorEntity));
 
                 mockMvc.perform(
                                 MockMvcRequestBuilders.get("/api/authors").contentType(MediaType.APPLICATION_JSON))
@@ -97,7 +102,7 @@ public class AuthorControllerIntegrationTests {
         public void testThatGetAuthorResturnsOk() throws Exception {
 
                 AuthorEntity testAuthorEntity = TestDataUtil.createTestAuthor();
-                authorService.saveAuthor(testAuthorEntity);
+                authorService.saveAuthor(authorMapper.mapTo(testAuthorEntity));
 
                 mockMvc.perform(
                                 MockMvcRequestBuilders.get("/api/authors/" + testAuthorEntity.getId())
@@ -119,7 +124,7 @@ public class AuthorControllerIntegrationTests {
         public void testThatGetAuthorReturnsProperAuthor() throws Exception {
 
                 AuthorEntity testAuthorEntity = TestDataUtil.createTestAuthor();
-                authorService.saveAuthor(testAuthorEntity);
+                authorService.saveAuthor(authorMapper.mapTo(testAuthorEntity));
 
                 mockMvc.perform(
                                 MockMvcRequestBuilders.get("/api/authors/" + testAuthorEntity.getId())
@@ -136,7 +141,7 @@ public class AuthorControllerIntegrationTests {
         public void testThatUpdateAuthorReturnsHttpOk() throws Exception {
                 AuthorEntity testAuthorEntity = TestDataUtil.createTestAuthor();
 
-                authorService.saveAuthor(testAuthorEntity);
+                authorService.saveAuthor(authorMapper.mapTo(testAuthorEntity));
 
                 testAuthorEntity.setAge(90);
 
@@ -155,7 +160,7 @@ public class AuthorControllerIntegrationTests {
         public void testThatUpdatesAuthorWhenNotFoundReturnsNotFound() throws Exception {
                 AuthorEntity testAuthorEntity = TestDataUtil.createTestAuthor();
 
-                authorService.saveAuthor(testAuthorEntity);
+                authorService.saveAuthor(authorMapper.mapTo(testAuthorEntity));
 
                 testAuthorEntity.setAge(90);
 
@@ -204,7 +209,8 @@ public class AuthorControllerIntegrationTests {
         @Test
         public void testThatPatchAuthorReturnsHttpStatusOk() throws Exception {
                 AuthorEntity testAuthor = TestDataUtil.createTestAuthor();
-                AuthorEntity savedAuthor = authorService.saveAuthor(testAuthor);
+                AuthorEntity savedAuthor = authorMapper
+                                .mapFrom(authorService.saveAuthor(authorMapper.mapTo(testAuthor)));
 
                 AuthorEntity testAuthorUpdate = AuthorEntity.builder()
                                 .id(null)
@@ -244,7 +250,8 @@ public class AuthorControllerIntegrationTests {
         @Test
         public void testThatPatchAuthorChangesValues() throws Exception {
                 AuthorEntity authorEntity = TestDataUtil.createTestAuthor();
-                AuthorEntity savedAuthor = authorService.saveAuthor(authorEntity);
+                AuthorEntity savedAuthor = authorMapper
+                                .mapFrom(authorService.saveAuthor(authorMapper.mapTo(authorEntity)));
 
                 AuthorEntity authorEntityUpdate = AuthorEntity.builder()
                                 .id(null)
@@ -270,7 +277,8 @@ public class AuthorControllerIntegrationTests {
         public void testThatDeleteAuthorReturnsHttpNoContent() throws Exception {
 
                 AuthorEntity authorEntity = TestDataUtil.createTestAuthor();
-                AuthorEntity savedAuthor = authorService.saveAuthor(authorEntity);
+                AuthorEntity savedAuthor = authorMapper
+                                .mapFrom(authorService.saveAuthor(authorMapper.mapTo(authorEntity)));
 
                 mockMvc.perform(
                                 MockMvcRequestBuilders.delete("/api/authors/" + savedAuthor.getId())

@@ -18,6 +18,7 @@ import com.miguel.database_sql.TestDataUtil;
 import com.miguel.database_sql.domain.dto.BookDto;
 import com.miguel.database_sql.domain.entities.AuthorEntity;
 import com.miguel.database_sql.domain.entities.BookEntity;
+import com.miguel.database_sql.mappers.Mapper;
 import com.miguel.database_sql.services.BookService;
 
 @SpringBootTest
@@ -32,11 +33,15 @@ public class BookControllerIntegrationTests {
 
         private ObjectMapper objectMapper;
 
+        private Mapper<BookEntity, BookDto> bookMapper;
+
         @Autowired
-        public BookControllerIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper, BookService bookService) {
+        public BookControllerIntegrationTests(MockMvc mockMvc, ObjectMapper objectMapper, BookService bookService,
+                        Mapper<BookEntity, BookDto> bookMapper) {
                 this.mockMvc = mockMvc;
                 this.objectMapper = objectMapper;
                 this.bookService = bookService;
+                this.bookMapper = bookMapper;
         }
 
         @Test
@@ -67,8 +72,8 @@ public class BookControllerIntegrationTests {
                 BookEntity testBookA = TestDataUtil.createTestBook(null);
                 BookEntity testBookB = TestDataUtil.createTestBook(null);
 
-                bookService.createUpdateBook(testBookA.getIsbn(), testBookA);
-                bookService.createUpdateBook(testBookB.getIsbn(), testBookB);
+                bookService.createUpdateBook(testBookA.getIsbn(), bookMapper.mapTo(testBookA));
+                bookService.createUpdateBook(testBookB.getIsbn(), bookMapper.mapTo(testBookB));
 
                 mockMvc.perform(
                                 MockMvcRequestBuilders.get("/api/books")
@@ -82,7 +87,7 @@ public class BookControllerIntegrationTests {
         @Test
         public void testThatGetBookReturnsHttpOk() throws Exception {
                 BookEntity testBookEntityA = TestDataUtil.createTestBook(null);
-                bookService.createUpdateBook(testBookEntityA.getIsbn(), testBookEntityA);
+                bookService.createUpdateBook(testBookEntityA.getIsbn(), bookMapper.mapTo(testBookEntityA));
 
                 mockMvc.perform(
                                 MockMvcRequestBuilders.get("/api/books/" + testBookEntityA.getIsbn())
@@ -101,7 +106,7 @@ public class BookControllerIntegrationTests {
         @Test
         public void testThatGetBookByIsbnReturnExpectedBook() throws Exception {
                 BookEntity testBookEntity = TestDataUtil.createTestBook(null);
-                bookService.createUpdateBook(testBookEntity.getIsbn(), testBookEntity);
+                bookService.createUpdateBook(testBookEntity.getIsbn(), bookMapper.mapTo(testBookEntity));
 
                 mockMvc.perform(
                                 MockMvcRequestBuilders.get("/api/books/" + testBookEntity.getIsbn())
@@ -150,7 +155,8 @@ public class BookControllerIntegrationTests {
         @Test
         public void testThatPatchBookReturnsHttpStatusOk() throws Exception {
                 BookEntity testBook = TestDataUtil.createTestBook(null);
-                BookEntity savedBook = bookService.createUpdateBook(testBook.getIsbn(), testBook);
+                BookEntity savedBook = bookMapper
+                                .mapFrom(bookService.createUpdateBook(testBook.getIsbn(), bookMapper.mapTo(testBook)));
 
                 AuthorEntity authorEntity = AuthorEntity.builder().id(1L).name("Damn").age(50).build();
                 savedBook.setAuthorEntity(authorEntity);
@@ -170,7 +176,8 @@ public class BookControllerIntegrationTests {
         @Test
         public void testThatPatchBookReturnsHttpStatusNotFound() throws Exception {
                 BookEntity testBook = TestDataUtil.createTestBook(null);
-                BookEntity savedBook = bookService.createUpdateBook(testBook.getIsbn(), testBook);
+                BookEntity savedBook = bookMapper
+                                .mapFrom(bookService.createUpdateBook(testBook.getIsbn(), bookMapper.mapTo(testBook)));
 
                 AuthorEntity authorEntity = AuthorEntity.builder().id(1L).name("Damn").age(50).build();
                 savedBook.setAuthorEntity(authorEntity);
@@ -190,7 +197,8 @@ public class BookControllerIntegrationTests {
         @Test
         public void testThatPatchBookReturnsUpdatedBookValues() throws Exception {
                 BookEntity testBook = TestDataUtil.createTestBook(null);
-                BookEntity savedBook = bookService.createUpdateBook(testBook.getIsbn(), testBook);
+                BookEntity savedBook = bookMapper
+                                .mapFrom(bookService.createUpdateBook(testBook.getIsbn(), bookMapper.mapTo(testBook)));
 
                 savedBook.setTitle("Update");
 
@@ -208,8 +216,8 @@ public class BookControllerIntegrationTests {
         @Test
         public void testThatDeleteBookReturnsHttpNoContent() throws Exception {
                 BookEntity bookEntity = TestDataUtil.createTestBook(null);
-                BookEntity savedBook = bookService.createUpdateBook(bookEntity.getIsbn(), bookEntity);
-
+                BookEntity savedBook = bookMapper.mapFrom(
+                                bookService.createUpdateBook(bookEntity.getIsbn(), bookMapper.mapTo(bookEntity)));
                 mockMvc.perform(
                                 MockMvcRequestBuilders.delete("/api/books/" + savedBook.getIsbn())
                                                 .contentType(MediaType.APPLICATION_JSON))

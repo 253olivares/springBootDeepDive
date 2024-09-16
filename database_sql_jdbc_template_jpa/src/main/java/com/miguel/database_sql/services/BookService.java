@@ -6,21 +6,22 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import com.miguel.database_sql.domain.dto.BookDto;
 import com.miguel.database_sql.domain.entities.BookEntity;
 
 public interface BookService {
 
-    BookEntity createUpdateBook(String isbn, BookEntity book);
+    BookDto createUpdateBook(String isbn, BookDto book);
 
-    List<BookEntity> findAll();
+    List<BookDto> findAll();
 
-    Page<BookEntity> findAll(Pageable pageable);
+    Page<BookDto> findAll(Pageable pageable);
 
-    Optional<BookEntity> findOne(String isbn);
+    Optional<BookDto> findOne(String isbn);
 
     boolean isExists(String isbn);
 
-    BookEntity partialUpdateBook(String isbn, BookEntity bookEntity);
+    BookDto partialUpdateBook(String isbn, BookDto bookDto);
 
     void delete(String isbn);
 

@@ -3,19 +3,19 @@ package com.miguel.database_sql.services;
 import java.util.List;
 import java.util.Optional;
 
-import com.miguel.database_sql.domain.entities.AuthorEntity;
+import com.miguel.database_sql.domain.dto.AuthorDto;
 
 public interface AuthorService {
 
-    AuthorEntity saveAuthor(AuthorEntity author);
+    AuthorDto saveAuthor(AuthorDto author);
 
-    List<AuthorEntity> findAll();
+    List<AuthorDto> findAll();
 
-    Optional<AuthorEntity> findOne(Long id);
+    Optional<AuthorDto> findOne(Long id);
 
     boolean isExists(Long id);
 
-    AuthorEntity partialUpdateAuthor(Long id, AuthorEntity author);
+    AuthorDto partialUpdateAuthor(Long id, AuthorDto author);
 
     void delete(Long id);
 
