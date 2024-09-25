@@ -4,7 +4,7 @@
 
 RESTful API Endponts
 
-Tech: Java, Spring Boot, H2, Spring Testing, Postgressql
+Tech: Java, Maven, Spring Boot, H2, Spring Testing, Postgressql
 
 ###### User EndPoints:
 
@@ -55,6 +55,8 @@ Spring Test - Create testing scripts to test service methods run the correct sql
 #### Fontend : NextJS Application
 
 A book tracker application for libraries. App keeps track of books that exist at the library and allow users to leave reviews. Users can also store a list of books they want to favorite. The list is serialized and then kept in the database. When books are created an author is registered if they do not exist within the database already.
+
+Tech: NextJS, Redux Toolkit, Tailwind CSS, Figma, Visual Studio Code
 
 Wire Frame: WIP
 
