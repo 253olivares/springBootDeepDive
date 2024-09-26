@@ -58,6 +58,8 @@ A book tracker application for libraries. App keeps track of books that exist at
 
 Tech: NextJS, Redux Toolkit, Tailwind CSS, Figma, Visual Studio Code
 
-Wire Frame: WIP
+###### Wire Frame: 
+WIP
 
-Figma Diagram: WIP
+###### Figma Diagram: 
+WIP
